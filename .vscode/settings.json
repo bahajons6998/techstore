@@ -1,0 +1,35 @@
+{
+  // Explorer daraxt oraliqlarini o'rnatish (pikselda)
+  // Kattaroq qiymat - ko'proq joy
+  "workbench.tree.indent": 24,
+  
+  // Explorer daraxt oraliqlarining chiziqlari
+  "workbench.tree.renderIndentGuides": "always",
+  
+  // Papkalar bir biridan ajralib turishi uchun
+  "explorer.compactFolders": false,
+  
+  // Daraxt elementlarini bir marta bosib ochish
+  "workbench.tree.expandMode": "singleClick",
+  
+  // Daraxt elementlarining shrifti o'lchami (pikselda)
+  "editor.fontSize": 14,
+  
+  // Papkalarni avtomatik yoyish
+  "explorer.autoReveal": true,
+  
+  // Qo'shimcha kenglik uchun
+  "editor.lineHeight": 24,
+  
+  // Explorer elementlari uchun balandroq qiymati (muhim sozlama)
+  "workbench.tree.itemHeight": 28,
+  
+  // Listdagi elementlar orasidagi masofa
+  "list.rowHeight": 28,
+  
+  // Explorer menyusini kengroq qilish
+  "explorer.openEditors.visible": 10,
+  
+  // Elementlar orasida bo'shliq qo'shish
+  "list.spacing": 5
+}

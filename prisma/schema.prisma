@@ -1,0 +1,116 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  // Custom output path o'chirildi - standart joyga generatsiya qilish uchun
+}
+
+// MySQL ishlatish uchun
+ datasource db {
+   provider = "mysql"
+   url      = env("DATABASE_URL")
+ }
+
+// SQLite ishlatish uchun
+//datasource db {
+//  provider = "sqlite"
+//  url      = env("DATABASE_URL")
+//}
+
+// Foydalanuvchi modeli
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  orders    Order[]
+
+  @@map("users")
+}
+
+// Foydalanuvchi rollari
+enum Role {
+  USER
+  ADMIN
+}
+
+// Kategoriya modeli (yangi)
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  imageUrl    String?   @map("image_url")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  
+  products    Product[]
+  
+  @@map("categories")
+}
+
+// Mahsulot modeli
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Decimal
+  stock       Int      @default(0)
+  imageUrl    String?  @map("image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Kategoriyaga bog'lanish
+  categoryId  Int?     @map("category_id")
+  category    Category? @relation(fields: [categoryId], references: [id])
+  
+  orderItems  OrderItem[]
+  
+  @@map("products")
+}
+
+// Buyurtma modeli
+model Order {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  status    OrderStatus @default(PENDING)
+  totalPrice Decimal  @map("total_price")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  
+  user      User      @relation(fields: [userId], references: [id])
+  items     OrderItem[]
+  
+  @@map("orders")
+}
+
+// Buyurtma statusi
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// Buyurtma elementi modeli
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  orderId   Int      @map("order_id")
+  productId Int      @map("product_id")
+  quantity  Int
+  price     Decimal
+  
+  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+  
+  @@map("order_items")
+}
