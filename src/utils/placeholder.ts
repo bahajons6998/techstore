@@ -1,18 +1,5 @@
-// Placeholder rasm SVG formatida
-const placeholderSvg = `
-<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="300" height="300" fill="#f0f0f0"/>
-  <path d="M144.435 127.25L112.185 149.4L144.435 171.55L176.685 149.4L144.435 127.25Z" stroke="#a0a0a0" stroke-width="2"/>
-  <path d="M144.435 171.55V215.85" stroke="#a0a0a0" stroke-width="2"/>
-  <path d="M176.685 149.4V193.7" stroke="#a0a0a0" stroke-width="2"/>
-  <path d="M112.185 149.4V193.7" stroke="#a0a0a0" stroke-width="2"/>
-  <path d="M144.435 127.25V83.15" stroke="#a0a0a0" stroke-width="2"/>
-  <text x="150" y="230" text-anchor="middle" font-family="Arial" font-size="14" fill="#a0a0a0">No Image</text>
-</svg>
-`;
-
-// SVG -> Base64
-const placeholderBase64 = Buffer.from(placeholderSvg).toString('base64');
-const placeholderImageUrl = `data:image/svg+xml;base64,${placeholderBase64}`;
+// Placeholder rasm - tayyor Base64 formatida
+// Bu ko'dlash Build paytida muammolarni bartaraf etish uchun qo'lda tayyorlangan
+const placeholderImageUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDMwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiAgPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNmMGYwZjAiLz4KICA8cGF0aCBkPSJNMTQ0LjQzNSAxMjcuMjVMMTEyLjE4NSAxNDkuNEwxNDQuNDM1IDE3MS41NUwxNzYuNjg1IDE0OS40TDE0NC40MzUgMTI3LjI1WiIgc3Ryb2tlPSIjYTBhMGEwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8cGF0aCBkPSJNMTQ0LjQzNSAxNzEuNTVWMjE1Ljg1IiBzdHJva2U9IiNhMGEwYTAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0xNzYuNjg1IDE0OS40VjE5My43IiBzdHJva2U9IiNhMGEwYTAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0xMTIuMTg1IDE0OS40VjE5My43IiBzdHJva2U9IiNhMGEwYTAiIHN0cm9rZS13aWR0aD0iMiIvPgogIDxwYXRoIGQ9Ik0xNDQuNDM1IDEyNy4yNVY4My4xNSIgc3Ryb2tlPSIjYTBhMGEwIiBzdHJva2Utd2lkdGg9IjIiLz4KICA8dGV4dCB4PSIxNTAiIHk9IjIzMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjYTBhMGEwIj5ObyBJbWFnZTwvdGV4dD4KPC9zdmc+Cg==';
 
 export default placeholderImageUrl;

@@ -88,8 +88,6 @@ export default function AddProductForm() {
       const res = await fetch('/api/categories');
       if (!res.ok) throw new Error('Kategoriyalarni olishda xatolik');
       const data = await res.json();
-      console.log(data);
-      setCategories(data)
       return data.categories;
     }
     catch (err) {
@@ -100,8 +98,7 @@ export default function AddProductForm() {
 
   // Fetch categories on mount
   useEffect(() => {
-    getCategories()
-
+    getCategories().then(setCategories);
   }, []);
 
 
@@ -109,7 +106,7 @@ export default function AddProductForm() {
   return (
     <div className="max-w-4xl mx-auto my-10 p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Yangi mahsulot qo'shish</h1>
-      
+
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
@@ -146,7 +143,6 @@ export default function AddProductForm() {
             onChange={handleChange}
             className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
-            {/* <option value="">Kategoriya tanlang</option> */}
             {categories?.map((category: any) => (
               <option key={category.id} value={category.id}>
                 {category.name}

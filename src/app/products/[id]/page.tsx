@@ -6,9 +6,9 @@ import { UniversalImage } from '@/components/ui';
 import ProductActions from '@/components/products/ProductActions';
 
 interface ProductPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 // Product tipini kengaytiramiz

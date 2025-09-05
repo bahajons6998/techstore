@@ -1,12 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 
-
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+// Next.js 15 da params Promise bo'ladi
+export async function GET(request: NextRequest, context: { params: Promise<{ id: string }> }) {
     try {
+        // params Promise bo'lgani uchun await qilishimiz kerak
+        const { id } = await context.params;
+        
         const category = await prisma.category.findFirst({
             where: {
-                id: parseInt(params.id, 10),
+                id: parseInt(id, 10),
             },
         });
 
