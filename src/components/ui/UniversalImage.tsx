@@ -62,8 +62,8 @@ export default function UniversalImage({
       
       // Domain www. bilan boshlansa, uni olib tashlaymiz
       const hostname = url.hostname.replace(/^www\./, '');
-      
-      return allowedDomains.some(domain => 
+
+      return allowedDomains.some(domain =>
         hostname === domain || hostname.endsWith(`.${domain}`)
       );
     } catch (e) {
