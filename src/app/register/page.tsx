@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { register } from '@/app/actions/auth';
 import Link from 'next/link';
 
-export default function RegisterForm() {
+// useSearchParams hook-ni ishlatadigan asosiy komponent
+function RegisterFormContent() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -146,5 +147,19 @@ export default function RegisterForm() {
         </div>
       </form>
     </div>
+  );
+}
+
+// Suspense bilan o'ralgan eksport qilinadigan komponent
+export default function RegisterForm() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-6 text-center">Ro'yxatdan o'tish</h1>
+        <p className="text-center text-gray-500">Yuklanmoqda...</p>
+      </div>
+    }>
+      <RegisterFormContent />
+    </Suspense>
   );
 }
