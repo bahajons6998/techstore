@@ -69,6 +69,7 @@ export async function getLoggedInUser() {
 export async function login(formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
+    const redirectUrl = formData.get('redirect') as string || '/';
 
     try {
         // Foydalanuvchini topish
@@ -93,7 +94,7 @@ export async function login(formData: FormData) {
             role: user.role,
         });
 
-        return { success: true };
+        return { success: true, redirectUrl };
     } catch (error) {
         console.error('Login xatoligi:', error);
         return { error: 'Login paytida xatolik yuz berdi' };
@@ -105,6 +106,7 @@ export async function register(formData: FormData) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const name = formData.get('name') as string;
+    const redirectUrl = formData.get('redirect') as string || '/';
 
     try {
         // Foydalanuvchi mavjudligini tekshirish
@@ -136,7 +138,7 @@ export async function register(formData: FormData) {
             role: user.role,
         });
 
-        return { success: true };
+        return { success: true, redirectUrl };
     } catch (error) {
         console.error('Ro\'yxatdan o\'tish xatoligi:', error);
         return { error: 'Ro\'yxatdan o\'tish paytida xatolik yuz berdi' };

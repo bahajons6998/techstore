@@ -1,26 +1,65 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { login } from '@/app/actions/auth';
 import Link from 'next/link';
 
 export default function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formValues, setFormValues] = useState({
+    email: '',
+    password: ''
+  });
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
+  const message = searchParams.get('message');
+  const email = searchParams.get('email');
 
-  async function handleSubmit(formData: FormData) {
+  // URL'dan kelgan email va xabarni qo'llash
+  useEffect(() => {
+    if (email) {
+      setFormValues(prev => ({ ...prev, email }));
+    }
+    
+    if (message) {
+      setError(decodeURIComponent(message));
+    }
+  }, [message, email]);
+
+  // Form qiymatlarini o'zgartirish
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setLoading(true);
     setError('');
+    
+    // FormData obyektini yaratish
+    const formData = new FormData();
+    formData.append('email', formValues.email);
+    formData.append('password', formValues.password);
+    formData.append('redirect', redirectUrl);
     
     try {
       const result = await login(formData);
       
       if (result.error) {
+        // Agar foydalanuvchi topilmasa, ro'yxatdan o'tish sahifasiga yo'naltiramiz
+        if (result.error === 'Foydalanuvchi topilmadi') {
+          router.push(`/register?redirect=${encodeURIComponent(redirectUrl)}&email=${encodeURIComponent(formValues.email)}&message=${encodeURIComponent('Bu email bilan foydalanuvchi mavjud emas. Iltimos, ro\'yxatdan o\'ting.')}`);
+          return;
+        }
+        
         setError(result.error);
       } else {
-        router.push('/');
+        // Login bo'lgandan so'ng redirect URL ga yo'naltirish
+        router.push(result.redirectUrl || '/');
         router.refresh();
       }
     } catch (err) {
@@ -41,7 +80,13 @@ export default function LoginForm() {
         </div>
       )}
       
-      <form action={handleSubmit}>
+      {redirectUrl === '/checkout' && (
+        <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded-md">
+          Buyurtma berish uchun avval tizimga kirishingiz kerak
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
             Email
@@ -50,6 +95,8 @@ export default function LoginForm() {
             type="email"
             id="email"
             name="email"
+            value={formValues.email}
+            onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -63,6 +110,8 @@ export default function LoginForm() {
             type="password"
             id="password"
             name="password"
+            value={formValues.password}
+            onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -78,7 +127,7 @@ export default function LoginForm() {
         
         <div className="mt-4 text-center text-sm">
           Akkountingiz yo'qmi?{' '}
-          <Link href="/register" className="text-blue-600 hover:underline">
+          <Link href={`/register?redirect=${encodeURIComponent(redirectUrl)}`} className="text-blue-600 hover:underline">
             Ro'yxatdan o'tish
           </Link>
         </div>

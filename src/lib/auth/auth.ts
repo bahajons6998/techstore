@@ -49,3 +49,9 @@ export async function isAdmin() {
   const user = await getCurrentUser();
   return user && typeof user === 'object' && user.role === 'ADMIN';
 }
+
+// Foydalanuvchi ro'yxatdan o'tganligini tekshirish
+export async function isAuthenticated() {
+  const user = await getCurrentUser();
+  return !!user; // user null bo'lmasa true, aks holda false qaytaradi
+}

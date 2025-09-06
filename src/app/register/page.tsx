@@ -1,18 +1,52 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { register } from '@/app/actions/auth';
 import Link from 'next/link';
 
 export default function RegisterForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formValues, setFormValues] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams.get('redirect') || '/';
+  const message = searchParams.get('message');
+  const email = searchParams.get('email');
 
-  async function handleSubmit(formData: FormData) {
+  // URL'dan kelgan email va xabarni qo'llash
+  useEffect(() => {
+    if (email) {
+      setFormValues(prev => ({ ...prev, email }));
+    }
+    
+    if (message) {
+      setError(decodeURIComponent(message));
+    }
+  }, [message, email]);
+
+  // Form qiymatlarini o'zgartirish
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setLoading(true);
     setError('');
+    
+    // FormData obyektini yaratish
+    const formData = new FormData();
+    formData.append('name', formValues.name);
+    formData.append('email', formValues.email);
+    formData.append('password', formValues.password);
+    formData.append('redirect', redirectUrl);
     
     try {
       const result = await register(formData);
@@ -20,7 +54,8 @@ export default function RegisterForm() {
       if (result.error) {
         setError(result.error);
       } else {
-        router.push('/');
+        // Ro'yxatdan o'tgandan so'ng redirect URL ga yo'naltirish
+        router.push(result.redirectUrl || '/');
         router.refresh();
       }
     } catch (err) {
@@ -41,7 +76,13 @@ export default function RegisterForm() {
         </div>
       )}
       
-      <form action={handleSubmit}>
+      {redirectUrl === '/checkout' && (
+        <div className="mb-4 p-3 bg-blue-100 text-blue-700 rounded-md">
+          Buyurtma berish uchun avval ro'yxatdan o'tishingiz kerak
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
             Ism
@@ -50,6 +91,8 @@ export default function RegisterForm() {
             type="text"
             id="name"
             name="name"
+            value={formValues.name}
+            onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -63,6 +106,8 @@ export default function RegisterForm() {
             type="email"
             id="email"
             name="email"
+            value={formValues.email}
+            onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -76,6 +121,8 @@ export default function RegisterForm() {
             type="password"
             id="password"
             name="password"
+            value={formValues.password}
+            onChange={handleChange}
             required
             minLength={6}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -93,7 +140,7 @@ export default function RegisterForm() {
         
         <div className="mt-4 text-center text-sm">
           Akkountingiz bormi?{' '}
-          <Link href="/login" className="text-blue-600 hover:underline">
+          <Link href={`/login?redirect=${encodeURIComponent(redirectUrl)}`} className="text-blue-600 hover:underline">
             Kirish
           </Link>
         </div>
