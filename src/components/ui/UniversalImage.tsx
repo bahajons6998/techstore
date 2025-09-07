@@ -98,6 +98,7 @@ export default function UniversalImage({
           height={fill ? undefined : (height || 300)}
           fill={fill}
           className={className}
+          style={{ objectFit: 'contain' }} // Agar fill true bo'lsa, objectFit ni cover qilamiz
           sizes={sizes || '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
           priority={priority}
           onError={handleError}

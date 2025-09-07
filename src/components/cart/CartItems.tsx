@@ -134,7 +134,7 @@ export default function CartItems() {
                   {item.name}
                 </Link>
                 <p className="mt-1 text-sm text-gray-500">
-                  {new Intl.NumberFormat('uz-UZ').format(item.price)} so&apos;m
+                  {item.price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so&apos;m
                 </p>
               </div>
               
@@ -173,7 +173,7 @@ export default function CartItems() {
       <div className="bg-gray-50 p-6 rounded-lg">
         <div className="flex justify-between text-base font-medium text-gray-900 mb-3">
           <p>Jami</p>
-          <p>{new Intl.NumberFormat('uz-UZ').format(totalPrice)} so&apos;m</p>
+          <p>{totalPrice.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so&apos;m</p>
         </div>
         <div className="flex justify-between text-sm text-gray-500 mb-6">
           <p>Yetkazib berish</p>

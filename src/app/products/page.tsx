@@ -27,7 +27,7 @@ export default async function ProductsPage() {
               <p className="text-gray-600 mb-4 text-sm line-clamp-2 h-10">{product.description}</p>
               <div className="flex justify-between items-center">
                 <span className="text-lg font-bold text-blue-600">
-                  {new Intl.NumberFormat('uz-UZ').format(product.price)} so'm
+                  {product.price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm
                 </span>
                 <Link 
                   href={`/products/${product.id}`}

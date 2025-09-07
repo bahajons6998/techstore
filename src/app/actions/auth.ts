@@ -146,7 +146,10 @@ export async function register(formData: FormData) {
 // Logout
 export async function logout() {
     await removeTokenCookie();
-    redirect('/login');
+    // redirect() funksiyasini client-side harakatlar uchun qaytarmaymiz
+    // bu 'use server' yozilgan kodda to'g'ri ishlaydi, lekin client-side-da chaqirilganda
+    // muammoli bo'lishi mumkin
+    return { success: true };
 }
 
 // Admin huquqini tekshirish

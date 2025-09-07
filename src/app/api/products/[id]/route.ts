@@ -5,10 +5,11 @@ import { isAdmin } from '@/lib/auth/auth';
 // GET: Mahsulot ma'lumotlarini olish
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = parseInt(params.id);
+        const resolvedParams = await params;
+        const id = parseInt(resolvedParams.id);
         
         if (isNaN(id)) {
             return NextResponse.json(
@@ -50,7 +51,7 @@ export async function GET(
 // PUT: Mahsulotni yangilash
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Admin ekanligini tekshirish
@@ -62,7 +63,8 @@ export async function PUT(
             );
         }
 
-        const id = parseInt(params.id);
+        const resolvedParams = await params;
+        const id = parseInt(resolvedParams.id);
         const data = await request.json();
 
         // Mahsulotni yangilash
@@ -103,7 +105,7 @@ export async function PUT(
 // DELETE: Mahsulotni o'chirish
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         // Admin ekanligini tekshirish
@@ -115,7 +117,8 @@ export async function DELETE(
             );
         }
 
-        const id = parseInt(params.id);
+        const resolvedParams = await params;
+        const id = parseInt(resolvedParams.id);
 
         // Mahsulotni o'chirish
         await prisma.product.delete({

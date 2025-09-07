@@ -14,6 +14,7 @@ export default function AddProductForm() {
     name: '',
     description: '',
     price: '',
+    stock: '',
     imageUrl: '',
     categoryId: ''
   });
@@ -68,7 +69,8 @@ export default function AddProductForm() {
         description: '',
         price: '',
         imageUrl: '',
-        categoryId: ''
+        categoryId: '',
+        stock: ''
       });
 
       // Mahsulotlar sahifasiga qaytish
@@ -88,7 +90,7 @@ export default function AddProductForm() {
       const res = await fetch('/api/categories');
       if (!res.ok) throw new Error('Kategoriyalarni olishda xatolik');
       const data = await res.json();
-      return data.categories;
+      setCategories(data);
     }
     catch (err) {
       console.error(err);
@@ -98,7 +100,7 @@ export default function AddProductForm() {
 
   // Fetch categories on mount
   useEffect(() => {
-    getCategories().then(setCategories);
+    getCategories();
   }, []);
 
 
@@ -149,6 +151,20 @@ export default function AddProductForm() {
               </option>
             ))}
           </select>
+        </div>
+        <div className="mb-4">
+          <label htmlFor="name" className="block text-sm font-medium mb-1">
+            Mahsulot miqdori *
+          </label>
+          <input
+            id="stock"
+            name="stock"
+            type="number"
+            value={formData.stock}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
 
         <div className="mb-4">

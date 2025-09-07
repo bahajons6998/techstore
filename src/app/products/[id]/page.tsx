@@ -116,7 +116,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                         
                         <div className="mb-6">
                             <p className="text-4xl font-bold text-blue-600 mb-1">
-                                {new Intl.NumberFormat('uz-UZ').format(product.price)} so'm
+                                {product.price.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} so'm
                             </p>
                             <p className="text-sm text-gray-500">
                                 {product.stock && product.stock > 0 ? `Omborda: ${product.stock} dona` : 'Omborda mavjud emas'}

@@ -1,11 +1,16 @@
 import Link from "next/link";
-import Image from "next/image";
 import Button from "@/components/ui/Button";
 import { getLoggedInUser } from "@/app/actions/auth";
 import { UniversalImage } from "@/components/ui";
+import { getProducts } from "@/lib/data";
+import PopularProductCard from "../components/products/PopularProductCard";
 
 export default async function Home() {
   const user = await getLoggedInUser();
+  // Mahsulotlarni olish
+  const allProducts = await getProducts();
+  // Mahsulotlardan 4 tasini random tanlash
+  const popularProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 4);
 
   return (
     <main>
@@ -39,13 +44,12 @@ export default async function Home() {
             
             <div className="flex-1 flex justify-center">
               <div className="relative w-full max-w-md h-96 transform hover:scale-105 transition-transform duration-500">
-                <Image
+                <UniversalImage
                   src="/globe.svg"
                   alt="Online do'kon"
                   fill
-                  style={{ objectFit: 'contain' }}
+                  className="object-contain drop-shadow-2xl"
                   priority
-                  className="drop-shadow-2xl"
                 />
               </div>
             </div>
@@ -124,40 +128,8 @@ export default async function Home() {
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Placeholder products */}
-            {[1, 2, 3, 4].map((item) => (
-              <div key={item} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow group">
-                <div className="relative h-48 bg-gray-100">
-                  <div className="absolute top-0 left-0 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-br-lg">
-                    Yangi
-                  </div>
-                  <div className="w-full h-full flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">Mahsulot {item}</h3>
-                    <div className="flex items-center">
-                      <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                      </svg>
-                      <span className="text-xs text-gray-500 ml-1">4.5</span>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">Lorem ipsum dolor sit amet consectetur.</p>
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold text-blue-600">1,200,000 so'm</span>
-                    <button className="p-2 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
+            {popularProducts.map((product) => (
+              <PopularProductCard key={product.id} product={product} />
             ))}
           </div>
           

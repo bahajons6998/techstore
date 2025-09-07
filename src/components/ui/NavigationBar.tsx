@@ -1,27 +1,88 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getLoggedInUser } from "@/app/actions/auth";
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { getLoggedInUser, logout } from "@/app/actions/auth";
 import Link from 'next/link';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function NavigationBar() {
 	const [user, setUser] = useState<any>(null);
 	const [loading, setLoading] = useState(true);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+	const userMenuRef = useRef<HTMLDivElement>(null);
+	const router = useRouter();
+	const pathname = usePathname();
 
+	// Foydalanuvchini yuklash funksiyasi
+	const fetchUser = useCallback(async () => {
+		try {
+			setLoading(true);
+			const userData = await getLoggedInUser();
+			setUser(userData);
+		} catch (error) {
+			console.error('Error fetching user:', error);
+			setUser(null);
+		} finally {
+			setLoading(false);
+		}
+	}, []);
+
+	// Har safar sahifa o'zgarganida foydalanuvchini qayta tekshirish
 	useEffect(() => {
-		async function fetchUser() {
-			try {
-				const userData = await getLoggedInUser();
-				setUser(userData);
-			} catch (error) {
-				console.error('Error fetching user:', error);
-			} finally {
-				setLoading(false);
+		fetchUser();
+	}, [fetchUser, pathname]); // pathname o'zgarganida qayta tekshirish
+
+	// Logout funksiyasi
+	const handleLogout = async () => {
+		try {
+			// Server-side logout
+			await logout();
+			
+			// Client-side-da foydalanuvchi holatini tozalash
+			setUser(null);
+			setIsUserMenuOpen(false);
+			
+			// Login sahifasiga yo'naltirish
+			router.push('/login');
+		} catch (error) {
+			console.error('Logout xatolik:', error);
+		}
+	};
+
+	// Click-outside handler for user menu
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+				setIsUserMenuOpen(false);
 			}
 		}
 
-		fetchUser();
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, []);
+
+	// Savatni yuklash
+	const [cartCount, setCartCount] = useState(0);
+	useEffect(() => {
+		// Client-side bo'lganda localStorage mavjud
+		if (typeof window !== 'undefined') {
+			const updateCartCount = () => {
+				const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+				setCartCount(cart.length);
+			};
+			
+			// Dastlab yuklash
+			updateCartCount();
+			
+			// Storage o'zgarishini kuzatish
+			window.addEventListener('storage', updateCartCount);
+			return () => {
+				window.removeEventListener('storage', updateCartCount);
+			};
+		}
 	}, []);
 
 	return (
@@ -46,13 +107,13 @@ export default function NavigationBar() {
 						<Link href="/products" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
 							Mahsulotlar
 						</Link>
-						<Link href="/categories" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+						<Link href="/categories" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
 							Kategoriyalar
 						</Link>
-						<Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+						<Link href="/about" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
 							Biz haqimizda
 						</Link>
-						<Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+						<Link href="/contact" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
 							Aloqa
 						</Link>
 					</nav>
@@ -65,33 +126,41 @@ export default function NavigationBar() {
 									<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
 									</svg>
-									<span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart') || '[]').length : 0}</span>
+									<span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">{cartCount}</span>
 								</Link>
 
 								{user ? (
-									<div className="relative group">
-										<button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors">
+									<div className="relative" ref={userMenuRef}>
+										<button 
+											className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors"
+											onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+										>
 											<span>Salom, {user.name}</span>
 											<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
 												<path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
 											</svg>
 										</button>
-										<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-											<Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-												Mening profilim
-											</Link>
-											<Link href="/orders" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-												Buyurtmalarim
-											</Link>
-											{user.isAdmin && (
-												<Link href="/admin/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-													Admin panel
+										{isUserMenuOpen && (
+											<div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+												<Link href="/profile" prefetch={false} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+													Mening profilim
 												</Link>
-											)}
-											<Link href="/logout" className="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-												Chiqish
-											</Link>
-										</div>
+												<Link href="/orders" prefetch={false} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+													Buyurtmalarim
+												</Link>
+												{user.role === 'ADMIN' && (
+													<Link href="/admin/dashboard" prefetch={false} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+														Admin panel
+													</Link>
+												)}
+												<button 
+													onClick={handleLogout}
+													className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+												>
+													Chiqish
+												</button>
+											</div>
+										)}
 									</div>
 								) : (
 									<Link href="/login" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
@@ -127,13 +196,13 @@ export default function NavigationBar() {
 							<Link href="/products" className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
 								Mahsulotlar
 							</Link>
-							<Link href="/categories" className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
+							<Link href="/categories" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
 								Kategoriyalar
 							</Link>
-							<Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
+							<Link href="/about" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
 								Biz haqimizda
 							</Link>
-							<Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
+							<Link href="/contact" prefetch={false} className="text-gray-700 hover:text-blue-600 font-medium transition-colors py-2">
 								Aloqa
 							</Link>
 						</nav>
@@ -143,7 +212,7 @@ export default function NavigationBar() {
 								<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
 								</svg>
-								<span>Savatcha (0)</span>
+								<span>Savatcha ({cartCount})</span>
 							</Link>
 
 							{!loading && (
@@ -152,20 +221,23 @@ export default function NavigationBar() {
 										<div className="flex flex-col space-y-2">
 											<span className="text-gray-700 font-medium">Salom, {user.name}</span>
 											<div className="flex flex-col space-y-1">
-												<Link href="/profile" className="text-sm text-gray-600 hover:text-blue-600">
+												<Link href="/profile" prefetch={false} className="text-sm text-gray-600 hover:text-blue-600">
 													Mening profilim
 												</Link>
-												<Link href="/orders" className="text-sm text-gray-600 hover:text-blue-600">
+												<Link href="/orders" prefetch={false} className="text-sm text-gray-600 hover:text-blue-600">
 													Buyurtmalarim
 												</Link>
-												{user.isAdmin && (
-													<Link href="/admin/dashboard" className="text-sm text-gray-600 hover:text-blue-600">
+												{user.role === 'ADMIN' && (
+													<Link href="/admin/dashboard" prefetch={false} className="text-sm text-gray-600 hover:text-blue-600">
 														Admin panel
 													</Link>
 												)}
-												<Link href="/logout" className="text-sm text-red-600 hover:text-red-700">
+												<button 
+													onClick={handleLogout}
+													className="text-sm text-left text-red-600 hover:text-red-700"
+												>
 													Chiqish
-												</Link>
+												</button>
 											</div>
 										</div>
 									) : (
